@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.r7frank.clientkeeper.dto.ClientDTO;
 import com.r7frank.clientkeeper.entities.Client;
 import com.r7frank.clientkeeper.repositories.ClientRepository;
 
@@ -17,15 +18,17 @@ public class ClientService {
 	ClientRepository clientRepository;
 	
 	@Transactional(readOnly = true)
-	public List<Client> findAll() {
-		return clientRepository.findAll();
+	public List<ClientDTO> findAll() {
+		List<Client> result = clientRepository.findAll();
+		return result.stream().map(x -> new ClientDTO(x)).toList();
 	}
 
 	@Transactional(readOnly = true)
-	public Client findById(Long id) {
+	public ClientDTO findById(Long id) {
 		Optional<Client> result = clientRepository.findById(id);
 		Client client = result.get();
-		return client;
+		ClientDTO dto = new ClientDTO(client);
+		return dto;
 	}
 
 }
