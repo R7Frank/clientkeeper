@@ -3,6 +3,8 @@ package com.r7frank.clientkeeper.entities;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import com.r7frank.clientkeeper.dto.ClientDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +29,15 @@ public class Client {
 	private Integer children;
 	
 	public Client() {
+	}
+	
+	public Client(ClientDTO entity) {
+		id = entity.getId();
+		name = entity.getName();
+		cpf = entity.getCpf();
+		income = entity.getIncome();
+		birthDate = entity.getBirthDate();
+		children = entity.getChildren();
 	}
 
 	public Long getId() {
