@@ -1,7 +1,5 @@
 package com.r7frank.clientkeeper.services;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,13 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.r7frank.clientkeeper.dto.ClientDTO;
 import com.r7frank.clientkeeper.entities.Client;
 import com.r7frank.clientkeeper.repositories.ClientRepository;
+import com.r7frank.clientkeeper.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ClientService {
-	
+
 	@Autowired
 	ClientRepository clientRepository;
-	
+
 	@Transactional(readOnly = true)
 	public Page<ClientDTO> findAll(Pageable pageable) {
 		Page<Client> result = clientRepository.findAll(pageable);
@@ -26,10 +27,9 @@ public class ClientService {
 
 	@Transactional(readOnly = true)
 	public ClientDTO findById(Long id) {
-		Optional<Client> result = clientRepository.findById(id);
-		Client client = result.get();
-		ClientDTO dto = new ClientDTO(client);
-		return dto;
+		Client client = clientRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Recurso Não Localizado!"));
+		return new ClientDTO(client);
 	}
 
 	@Transactional
@@ -38,27 +38,34 @@ public class ClientService {
 		client = clientRepository.save(client);
 		return new ClientDTO(client);
 	}
-	
+
 	@Transactional
 	public ClientDTO update(Long id, ClientDTO dto) {
-		Client client = clientRepository.getReferenceById(id);
-		copyDtoToEntity(dto, client);
-		client = clientRepository.save(client);		
-		return new ClientDTO(client);
+		try {
+			Client client = clientRepository.getReferenceById(id);
+			copyDtoToEntity(dto, client);
+			client = clientRepository.save(client);
+			return new ClientDTO(client);
+		}
+		catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Recurso não localizado!");
+		}
 	}
 
 	@Transactional
 	public void delete(Long id) {
-	clientRepository.deleteById(id);
+		if (!clientRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Recurso não localizado!");
+		}
+			clientRepository.deleteById(id);
 	}
-	
-	
+
 	private void copyDtoToEntity(ClientDTO dto, Client client) {
 		client.setName(dto.getName());
 		client.setCpf(dto.getCpf());
 		client.setIncome(dto.getIncome());
 		client.setBirthDate(dto.getBirthDate());
 		client.setChildren(dto.getChildren());
-	}	
-	
+	}
+
 }
