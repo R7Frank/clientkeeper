@@ -4,12 +4,21 @@ import java.time.LocalDate;
 
 import com.r7frank.clientkeeper.entities.Client;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
+
 public class ClientDTO {
 	
 	private Long id;
+	
+	@Size(min = 3, max = 50, message = "Esse campo requer o mínimo de 3 e o máximo de 50 caracteres!")
+	@NotBlank(message = "Campo de preenchimento obrigatório!")
 	private String name;
 	private String cpf;
 	private Double income;
+	
+	@PastOrPresent(message = "Data informada não pode ser superior a data de hoje!")
 	private LocalDate birthDate;
 	private Integer children;
 
@@ -54,6 +63,5 @@ public class ClientDTO {
 	public Integer getChildren() {
 		return children;
 	}
-
 	
 }

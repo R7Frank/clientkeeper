@@ -31,6 +31,5 @@ public class CustomError {
 	public String getPath() {
 		return path;
 	}
-    
-
+ 
 }
